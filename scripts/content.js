@@ -14,6 +14,7 @@ function convertYentoUSD(price_in_number) {
 }
 
 function replaceTextWithConversion(originalText) {
+    // this may be where need fix of "2000 yen" working, may need to just may regex allow this.
     const regex = /¥\d+(?:,\d{3})*\b/g;
     let modifiedText = originalText;
     let match;
@@ -21,7 +22,7 @@ function replaceTextWithConversion(originalText) {
     while ((match = regex.exec(originalText)) !== null) {
         const yenAmount = convertStringToNumber(match[0]);
         const usdAmount = "$" + convertYentoUSD(yenAmount);
-        modifiedText = modifiedText.replace(match[0], match[0] + ` <strong>${usdAmount} USD</strong>`);
+        modifiedText = modifiedText.replace(match[0], match[0] + ` <strong>(${usdAmount} USD)</strong>`);
     }
 
     return modifiedText;
@@ -33,7 +34,7 @@ function convertAllYenToUSD() {
 
     while(textNodes.nextNode()) {
         let current = textNodes.currentNode;
-        if (current.nodeValue.match(/¥\d+(?:,\d{3})*\b/)) {
+        if (current.nodeValue.match(/¥\d+(?:,\d{3})*\b/) || current.nodeValue.match(/\b\d{1,3}(?:,\d{3})*\s*yen\b/i)) {
             nodesToConvert.push(current);
         }
     }
