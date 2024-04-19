@@ -11,7 +11,7 @@
     {
       "js": ["scripts/content.js"],
       "matches": [
-        "https://realestate.co.jp/*"
+        "<all_urls>"
       ]
     }
   ],

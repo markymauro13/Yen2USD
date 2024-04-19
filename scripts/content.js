@@ -1,29 +1,3 @@
-const listingItems = document.querySelectorAll(".listing-item");
-
-// grabbing yen value
-listingItems.forEach(item => {
-    const regex = /¥\d{1,3}(?:,\d{3})*(?!\d)/g;
-    const yenUnformatted = item.textContent.match(regex);
-
-    if (yenUnformatted) {
-        yenUnformatted.forEach((price) => {
-            const price_in_number = convertStringToNumber(price)
-            const usd_price_string = "$" + convertYentoUSD(price_in_number)
-
-            console.log("YEN: " + price_in_number + "\nUSD: " + usd_price_string)
-        
-            const new_price = document.createElement("p");
-            new_price.style.color = '#555'; // dark gray text color
-            new_price.style.marginTop = '0.5em'; // space above the price
-            new_price.style.fontWeight = 'bold'; // make text bold
-            new_price.classList.add('usd-amount');
-
-            new_price.textContent = `USD: ${usd_price_string}`;
-            item.appendChild(new_price);
-        })
-    }
-});
-
 function convertStringToNumber(str) {
     // Remove non-numeric characters except for the decimal point
     var cleanedString = str.replace(/[^\d.-]/g, '');
@@ -32,10 +6,46 @@ function convertStringToNumber(str) {
     return number;
 }
 
-// convert number (yen) to usd (string), # -> # -> "$#"
 
 function convertYentoUSD(price_in_number) {
     // 1 YEN worth 0.0065 USD, based on the Apr. 17, 2024 13:0:0 exchange rate from openexchangerates.org.
     price_in_number = price_in_number * 0.0065
     return price_in_number.toLocaleString()
 }
+
+function replaceTextWithConversion(originalText) {
+    const regex = /¥\d+(?:,\d{3})*\b/g;
+    let modifiedText = originalText;
+    let match;
+
+    while ((match = regex.exec(originalText)) !== null) {
+        const yenAmount = convertStringToNumber(match[0]);
+        const usdAmount = "$" + convertYentoUSD(yenAmount);
+        modifiedText = modifiedText.replace(match[0], match[0] + ` <strong>${usdAmount} USD</strong>`);
+    }
+
+    return modifiedText;
+}
+
+function convertAllYenToUSD() {
+    const textNodes = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    let nodesToConvert = [];
+
+    while(textNodes.nextNode()) {
+        let current = textNodes.currentNode;
+        if (current.nodeValue.match(/¥\d+(?:,\d{3})*\b/)) {
+            nodesToConvert.push(current);
+        }
+    }
+
+    nodesToConvert.forEach(node => {
+        const newContent = replaceTextWithConversion(node.nodeValue);
+        if (newContent !== node.nodeValue) {
+            const newSpan = document.createElement('span');
+            newSpan.innerHTML = newContent;
+            node.parentNode.replaceChild(newSpan, node);
+        }
+    });
+}
+
+convertAllYenToUSD();
