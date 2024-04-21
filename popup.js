@@ -1,8 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
   const toggleSwitch = document.getElementById("toggleSwitch");
+  const currentCurrency = document.getElementById("currentCurrency");
+  const desiredCurrency = document.getElementById("desiredCurrency");
 
-  // Load the saved state of the toggle and apply it to the checkbox
-  chrome.storage.local.get("toggleState", function (data) {
+  // Restore the selected options
+  chrome.storage.local.get(["currentCurrency", "desiredCurrency", "toggleState"], function (data) {
+    currentCurrency.value = data.currentCurrency !== undefined ? data.currentCurrency : "JPY";
+    desiredCurrency.value = data.desiredCurrency !== undefined ? data.desiredCurrency : "USD";
     toggleSwitch.checked = data.toggleState !== undefined ? data.toggleState : true; // default to true if not set
   });
 
@@ -10,15 +14,6 @@ document.addEventListener("DOMContentLoaded", function () {
   toggleSwitch.addEventListener("change", function () {
     chrome.storage.local.set({ toggleState: toggleSwitch.checked });
     // Here you would typically send a message to your content script to enable or disable functionality
-  });
-
-  const currentCurrency = document.getElementById("currentCurrency");
-  const desiredCurrency = document.getElementById("desiredCurrency");
-
-  // Restore the selected options
-  chrome.storage.local.get(["currentCurrency", "desiredCurrency"], function (data) {
-    currentCurrency.value = data.currentCurrency !== undefined ? data.currentCurrency : "JPY";
-    desiredCurrency.value = data.desiredCurrency !== undefined ? data.desiredCurrency : "USD";
   });
 
   currentCurrency.addEventListener("change", function () {
