@@ -1,10 +1,32 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yen2USD</title>
+  </head>
   <body>
     <h1>Yen2USD</h1>
     <label>
-      <input type="checkbox" id="toggleSwitch" checked>
+      <input type="checkbox" id="toggleSwitch" checked />
       Enable/Disable
     </label>
+    <br />
+    <br />
+    <label for="currentCurrency">Current Currency: </label>
+    <select id="currentCurrency">
+      <option value="JPY">Japanese Yen</option>
+      <option value="CNY">Chinese Yuan</option>
+      <option value="KRW">South Korean Won</option>
+    </select>
+    <br />
+    <br />
+    <label for="desiredCurrency">Desired Currency: </label>
+    <select id="desiredCurrency">
+      <option value="USD">US Dollar</option>
+      <option value="EUR">Euro</option>
+    </select>
+
     <script src="popup.js"></script>
   </body>
 </html>
