@@ -59,21 +59,22 @@ class Freecurrencyapi {
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-let exchangeRate;
-let wantedCurrency;
-let currentCurrency;
-let formatter;
+let exchangeRate, wantedCurrency, currentCurrency, formatter, apiKey;
 
 async function fetchAndSetExchangeRate() {
-  const freecurrencyapi = new Freecurrencyapi("_____________API_KEY_GOES_HERE_____________");
-  return freecurrencyapi
-    .latest({
-      base_currency: "USD",
-    })
-    .then((response) => {
-      chrome.storage.local.set({ rateData: { date: Date.now(), rates: response["data"] } });
-      return 1 / response["data"][currentCurrency];
-    });
+  if (apiKey !== undefined) {
+    const freecurrencyapi = new Freecurrencyapi(apiKey);
+    return freecurrencyapi
+      .latest({
+        base_currency: "USD",
+      })
+      .then((response) => {
+        if (response["data"] !== undefined) {
+          chrome.storage.local.set({ rateData: { date: Date.now(), rates: response["data"] } });
+          return 1 / response["data"][currentCurrency];
+        }
+      });
+  }
 }
 
 async function retrieveLocalExchangeRate() {
@@ -96,15 +97,23 @@ async function retrieveLocalExchangeRate() {
   });
 }
 
-async function main() {
-  chrome.storage.local.get(["currentCurrency", "desiredCurrency"], function (data) {
+async function getLocalStorage() {
+  chrome.storage.local.get(["currentCurrency", "desiredCurrency", "apiKey"], function (data) {
     currentCurrency = data.currentCurrency !== undefined ? data.currentCurrency : "JPY";
     wantedCurrency = data.desiredCurrency !== undefined ? data.desiredCurrency : "USD";
+    apiKey = data.apiKey;
+
     formatter = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: wantedCurrency,
     });
+    if (apiKey !== undefined) {
+      main();
+    }
   });
+}
+
+async function main() {
   exchangeRate = await retrieveLocalExchangeRate();
   convertAllYenToUSD();
 }
@@ -177,4 +186,12 @@ chrome.runtime.onMessage.addListener(function (request) {
   location.reload();
 });
 
-main();
+chrome.runtime.onMessage.addListener(function (request) {
+  if (request.apiKey !== undefined) {
+    apiKey = request.apiKey;
+    chrome.storage.local.set({ apiKey: apiKey });
+  }
+  location.reload();
+});
+
+getLocalStorage();
