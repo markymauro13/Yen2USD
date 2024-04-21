@@ -19,15 +19,18 @@
       <input class="mb-2" type="text" id="apiKey" placeholder="API KEY HERE" />
 
       <label for="currentCurrency">Current Currency: </label>
-      <select class="mb-2" id="currentCurrency">
+      <select class="text-center" class="mb-2" id="currentCurrency">
         <option value="JPY">Japanese Yen</option>
-        <option value="CNY">Chinese Yuan</option>
-        <option value="KRW">South Korean Won</option>
+        <option disabled value="CNY">Chinese Yuan</option>
+        <option disabled value="KRW">South Korean Won</option>
       </select>
       <label for="desiredCurrency">Desired Currency: </label>
-      <select id="desiredCurrency">
+      <select class="text-center" id="desiredCurrency">
         <option value="USD">US Dollar</option>
         <option value="EUR">Euro</option>
+        <option value="CAD">Canadian Dollar</option>
+        <option value="CNY">Chinese Yuan</option>
+        <option value="KRW">South Korean Won</option>
       </select>
     </div>
     <script src="popup.js"></script>
