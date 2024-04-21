@@ -15,7 +15,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // Save the new state of the toggle each time it is changed
   toggleSwitch.addEventListener("change", function () {
     chrome.storage.local.set({ toggleState: toggleSwitch.checked });
-    // Here you would typically send a message to your content script to enable or disable functionality
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, { toggleState: toggleSwitch.checked });
+    });
   });
 
   currentCurrency.addEventListener("change", function () {

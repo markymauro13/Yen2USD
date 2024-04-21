@@ -59,7 +59,7 @@ class Freecurrencyapi {
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-let exchangeRate, wantedCurrency, currentCurrency, formatter, apiKey;
+let exchangeRate, wantedCurrency, currentCurrency, formatter, apiKey, toggleState;
 
 async function fetchAndSetExchangeRate() {
   if (apiKey !== undefined) {
@@ -98,16 +98,17 @@ async function retrieveLocalExchangeRate() {
 }
 
 async function getLocalStorage() {
-  chrome.storage.local.get(["currentCurrency", "desiredCurrency", "apiKey"], function (data) {
+  chrome.storage.local.get(["currentCurrency", "desiredCurrency", "apiKey", "toggleState"], function (data) {
     currentCurrency = data.currentCurrency !== undefined ? data.currentCurrency : "JPY";
     wantedCurrency = data.desiredCurrency !== undefined ? data.desiredCurrency : "USD";
     apiKey = data.apiKey;
+    toggleState = data.toggleState !== undefined ? data.toggleState : true;
 
     formatter = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: wantedCurrency,
     });
-    if (apiKey !== undefined) {
+    if (apiKey !== undefined && toggleState) {
       main();
     }
   });
@@ -190,6 +191,14 @@ chrome.runtime.onMessage.addListener(function (request) {
   if (request.apiKey !== undefined) {
     apiKey = request.apiKey;
     chrome.storage.local.set({ apiKey: apiKey });
+  }
+  location.reload();
+});
+
+chrome.runtime.onMessage.addListener(function (request) {
+  if (request.toggleState !== undefined) {
+    toggleState = request.toggleState;
+    chrome.storage.local.set({ toggleState: toggleState });
   }
   location.reload();
 });
