@@ -20,6 +20,10 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
+// to make apikey an env variable, reference: https://github.com/orgs/community/discussions/57070#discussioncomment-6240545 
+const apiKey = '';
+
 class Freecurrencyapi {
   baseUrl = "https://api.freecurrencyapi.com/v1/";
 
@@ -59,10 +63,9 @@ class Freecurrencyapi {
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-let exchangeRate, wantedCurrency, currentCurrency, formatter, apiKey, toggleState;
+let exchangeRate, wantedCurrency, currentCurrency, formatter, toggleState;
 
 async function fetchAndSetExchangeRate() {
-  if (apiKey !== undefined) {
     const freecurrencyapi = new Freecurrencyapi(apiKey);
     return freecurrencyapi
       .latest({
@@ -74,7 +77,6 @@ async function fetchAndSetExchangeRate() {
           return 1 / response["data"][currentCurrency];
         }
       });
-  }
 }
 
 async function retrieveLocalExchangeRate() {
@@ -98,17 +100,16 @@ async function retrieveLocalExchangeRate() {
 }
 
 async function getLocalStorage() {
-  chrome.storage.local.get(["currentCurrency", "desiredCurrency", "apiKey", "toggleState"], function (data) {
+  chrome.storage.local.get(["currentCurrency", "desiredCurrency", "toggleState"], function (data) {
     currentCurrency = data.currentCurrency !== undefined ? data.currentCurrency : "JPY";
     wantedCurrency = data.desiredCurrency !== undefined ? data.desiredCurrency : "USD";
-    apiKey = data.apiKey;
     toggleState = data.toggleState !== undefined ? data.toggleState : true;
 
     formatter = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: wantedCurrency,
     });
-    if (apiKey !== undefined && toggleState) {
+    if (toggleState) {
       main();
     }
   });
@@ -152,7 +153,7 @@ function convertAllYenToUSD() {
 
   while (textNodes.nextNode()) {
     let current = textNodes.currentNode;
-    if (current.nodeValue.match(/¥\d+(?:,\d{3})*\b/) || current.nodeValue.match(/\b\d{1,3}(?:,\d{3})*\s*yen\b/i)) {
+    if (current.nodeValue.match(/¥\d+(?:,\d{3})*\b/)) {
       nodesToConvert.push(current);
     }
   }
@@ -167,33 +168,33 @@ function convertAllYenToUSD() {
   });
 }
 
-chrome.runtime.onMessage.addListener(function (request) {
-  if (request.desiredCurrency !== undefined) {
-    wantedCurrency = request.desiredCurrency;
-    formatter = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: wantedCurrency,
-    });
-    chrome.storage.local.set({ desiredCurrency: wantedCurrency });
-  }
-  location.reload();
-});
+// chrome.runtime.onMessage.addListener(function (request) {
+//   if (request.desiredCurrency !== undefined) {
+//     wantedCurrency = request.desiredCurrency;
+//     formatter = new Intl.NumberFormat("en-US", {
+//       style: "currency",
+//       currency: wantedCurrency,
+//     });
+//     chrome.storage.local.set({ desiredCurrency: wantedCurrency });
+//   }
+//   location.reload();
+// });
 
-chrome.runtime.onMessage.addListener(function (request) {
-  if (request.currentCurrency !== undefined) {
-    currentCurrency = request.currentCurrency;
-    chrome.storage.local.set({ currentCurrency: currentCurrency });
-  }
-  location.reload();
-});
+// chrome.runtime.onMessage.addListener(function (request) {
+//   if (request.currentCurrency !== undefined) {
+//     currentCurrency = request.currentCurrency;
+//     chrome.storage.local.set({ currentCurrency: currentCurrency });
+//   }
+//   location.reload();
+// });
 
-chrome.runtime.onMessage.addListener(function (request) {
-  if (request.apiKey !== undefined) {
-    apiKey = request.apiKey;
-    chrome.storage.local.set({ apiKey: apiKey });
-  }
-  location.reload();
-});
+// chrome.runtime.onMessage.addListener(function (request) {
+//   if (request.apiKey !== undefined) {
+//     apiKey = request.apiKey;
+//     chrome.storage.local.set({ apiKey: apiKey });
+//   }
+//   location.reload();
+// });
 
 chrome.runtime.onMessage.addListener(function (request) {
   if (request.toggleState !== undefined) {
