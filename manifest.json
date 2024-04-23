@@ -10,7 +10,7 @@
   "content_scripts": [
     {
       "js": [
-        "scripts/setAPI_KEY.js",
+        "scripts/SET_API_KEY.js",
         "scripts/content.js"
       ],
       "matches": [
