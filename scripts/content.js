@@ -83,10 +83,10 @@ chrome.runtime.onMessage.addListener(function (request) {
     currentCurrency = request.currentCurrency;
     chrome.storage.local.set({ currentCurrency: currentCurrency });
   }
-  if (request.apiKey !== undefined) {
-    apiKey = request.apiKey;
-    chrome.storage.local.set({ apiKey: apiKey });
-  }
+  // if (request.apiKey !== undefined) {
+  //   apiKey = request.apiKey;
+  //   chrome.storage.local.set({ apiKey: apiKey });
+  // }
   if (request.toggleState !== undefined) {
     toggleState = request.toggleState;
     chrome.storage.local.set({ toggleState: toggleState });
