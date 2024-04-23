@@ -1,7 +1,9 @@
+// DO NOT PUT YOUR API KEY IN THIS TEMPLATE FILE
 // ADD `/scripts/SET_API_KEY.js`.gitignore
 // THEN USE THIS AS A TEMPLATE TO CREATE `SET_API_KEY.js in the `scripts` directory
 
-// PUT YOUR API KEY HERE
+// DO NOT PUT YOUR API KEY IN THIS TEMPLATE FILE
+// This is where you will put your API key in `/scripts/SET_API_KEY.js`
 const API_KEY = "";
 
 function setKey() {
