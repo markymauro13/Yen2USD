@@ -21,8 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// to make apikey an env variable, reference: https://github.com/orgs/community/discussions/57070#discussioncomment-6240545 
-const apiKey = '';
+// to make apikey an env variable, reference: https://github.com/orgs/community/discussions/57070#discussioncomment-6240545
+const apiKey = "";
+
+// set to true if you want to bypass monthly call and call API every time the page is loaded
+const DEBUG_API = false;
 
 class Freecurrencyapi {
   baseUrl = "https://api.freecurrencyapi.com/v1/";
@@ -95,10 +98,10 @@ chrome.runtime.onMessage.addListener(function (request) {
 });
 
 async function getLocalStorage() {
-  chrome.storage.local.get(["currentCurrency", "desiredCurrency", "apiKey", "toggleState"], function (data) {
+  chrome.storage.local.get(["currentCurrency", "desiredCurrency", "toggleState"], function (data) {
     currentCurrency = data.currentCurrency !== undefined ? data.currentCurrency : "JPY";
     wantedCurrency = data.desiredCurrency !== undefined ? data.desiredCurrency : "USD";
-    apiKey = data.apiKey;
+    //apiKey = data.apiKey;
     toggleState = data.toggleState !== undefined ? data.toggleState : true;
 
     formatter = new Intl.NumberFormat("en-US", {
@@ -112,23 +115,23 @@ async function getLocalStorage() {
 }
 
 async function fetchAndSetExchangeRate() {
-    const freecurrencyapi = new Freecurrencyapi(apiKey);
-    return freecurrencyapi
-      .latest({
-        base_currency: "USD",
-      })
-      .then((response) => {
-        if (response["data"] !== undefined) {
-          chrome.storage.local.set({ rateData: { date: Date.now(), rates: response["data"] } });
-          return 1 / response["data"][currentCurrency];
-        }
-      });
+  const freecurrencyapi = new Freecurrencyapi(apiKey);
+  return freecurrencyapi
+    .latest({
+      base_currency: "USD",
+    })
+    .then((response) => {
+      if (response["data"] !== undefined) {
+        chrome.storage.local.set({ rateData: { date: Date.now(), rates: response["data"] } });
+        return 1 / response["data"][currentCurrency];
+      }
+    });
 }
 
 async function retrieveLocalExchangeRate() {
   return new Promise((resolve) => {
     chrome.storage.local.get("rateData", async function (data) {
-      if (data.rateData !== undefined) {
+      if (data.rateData !== undefined && !DEBUG_API) {
         var monthSec = 2629800;
         if (data.rateData["date"] + monthSec > Date.now()) {
           let USDToWanted = data.rateData["rates"][wantedCurrency] / data.rateData["rates"]["USD"];
