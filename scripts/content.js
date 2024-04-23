@@ -20,6 +20,10 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
+// to make apikey an env variable, reference: https://github.com/orgs/community/discussions/57070#discussioncomment-6240545 
+const apiKey = '';
+
 class Freecurrencyapi {
   baseUrl = "https://api.freecurrencyapi.com/v1/";
 
@@ -59,7 +63,7 @@ class Freecurrencyapi {
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-let exchangeRate, wantedCurrency, currentCurrency, formatter, apiKey, toggleState;
+let exchangeRate, wantedCurrency, currentCurrency, formatter, toggleState;
 
 async function main() {
   exchangeRate = await retrieveLocalExchangeRate();
@@ -108,7 +112,6 @@ async function getLocalStorage() {
 }
 
 async function fetchAndSetExchangeRate() {
-  if (apiKey !== undefined) {
     const freecurrencyapi = new Freecurrencyapi(apiKey);
     return freecurrencyapi
       .latest({
@@ -120,7 +123,6 @@ async function fetchAndSetExchangeRate() {
           return 1 / response["data"][currentCurrency];
         }
       });
-  }
 }
 
 async function retrieveLocalExchangeRate() {
@@ -175,7 +177,7 @@ function convertAllYenToUSD() {
 
   while (textNodes.nextNode()) {
     let current = textNodes.currentNode;
-    if (current.nodeValue.match(/¥\d+(?:,\d{3})*\b/) || current.nodeValue.match(/\b\d{1,3}(?:,\d{3})*\s*yen\b/i)) {
+    if (current.nodeValue.match(/¥\d+(?:,\d{3})*\b/)) {
       nodesToConvert.push(current);
     }
   }
@@ -189,5 +191,4 @@ function convertAllYenToUSD() {
     }
   });
 }
-
 getLocalStorage();

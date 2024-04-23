@@ -5,11 +5,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const apiKey = document.getElementById("apiKey");
 
   // Restore the selected options
-  chrome.storage.local.get(["currentCurrency", "desiredCurrency", "toggleState", "apiKey"], function (data) {
+  chrome.storage.local.get(["currentCurrency", "desiredCurrency", "toggleState"], function (data) {
     currentCurrency.value = data.currentCurrency !== undefined ? data.currentCurrency : "JPY";
     desiredCurrency.value = data.desiredCurrency !== undefined ? data.desiredCurrency : "USD";
     toggleSwitch.checked = data.toggleState !== undefined ? data.toggleState : true; // default to true if not set
-    apiKey.value = data.apiKey !== undefined ? data.apiKey : "";
   });
 
   // Save the new state of the toggle each time it is changed
@@ -38,12 +37,12 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  apiKey.addEventListener("change", function () {
-    chrome.storage.local.set({ apiKey: apiKey.value }, function () {
-      // Data is saved, now send a message to content script
-      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, { apiKey: apiKey.value });
-      });
-    });
-  });
+  // apiKey.addEventListener("change", function () {
+  //   chrome.storage.local.set({ apiKey: apiKey.value }, function () {
+  //     // Data is saved, now send a message to content script
+  //     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  //       chrome.tabs.sendMessage(tabs[0].id, { apiKey: apiKey.value });
+  //     });
+  //   });
+  // });
 });
