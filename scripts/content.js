@@ -65,6 +65,52 @@ class Freecurrencyapi {
 
 let exchangeRate, wantedCurrency, currentCurrency, formatter, toggleState;
 
+async function main() {
+  exchangeRate = await retrieveLocalExchangeRate();
+  convertAllYenToUSD();
+}
+
+chrome.runtime.onMessage.addListener(function (request) {
+  if (request.desiredCurrency !== undefined) {
+    wantedCurrency = request.desiredCurrency;
+    formatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: wantedCurrency,
+    });
+    chrome.storage.local.set({ desiredCurrency: wantedCurrency });
+  }
+  if (request.currentCurrency !== undefined) {
+    currentCurrency = request.currentCurrency;
+    chrome.storage.local.set({ currentCurrency: currentCurrency });
+  }
+  // if (request.apiKey !== undefined) {
+  //   apiKey = request.apiKey;
+  //   chrome.storage.local.set({ apiKey: apiKey });
+  // }
+  if (request.toggleState !== undefined) {
+    toggleState = request.toggleState;
+    chrome.storage.local.set({ toggleState: toggleState });
+  }
+  location.reload();
+});
+
+async function getLocalStorage() {
+  chrome.storage.local.get(["currentCurrency", "desiredCurrency", "apiKey", "toggleState"], function (data) {
+    currentCurrency = data.currentCurrency !== undefined ? data.currentCurrency : "JPY";
+    wantedCurrency = data.desiredCurrency !== undefined ? data.desiredCurrency : "USD";
+    apiKey = data.apiKey;
+    toggleState = data.toggleState !== undefined ? data.toggleState : true;
+
+    formatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: wantedCurrency,
+    });
+    if (apiKey !== undefined && toggleState) {
+      main();
+    }
+  });
+}
+
 async function fetchAndSetExchangeRate() {
     const freecurrencyapi = new Freecurrencyapi(apiKey);
     return freecurrencyapi
@@ -99,27 +145,6 @@ async function retrieveLocalExchangeRate() {
   });
 }
 
-async function getLocalStorage() {
-  chrome.storage.local.get(["currentCurrency", "desiredCurrency", "toggleState"], function (data) {
-    currentCurrency = data.currentCurrency !== undefined ? data.currentCurrency : "JPY";
-    wantedCurrency = data.desiredCurrency !== undefined ? data.desiredCurrency : "USD";
-    toggleState = data.toggleState !== undefined ? data.toggleState : true;
-
-    formatter = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: wantedCurrency,
-    });
-    if (toggleState) {
-      main();
-    }
-  });
-}
-
-async function main() {
-  exchangeRate = await retrieveLocalExchangeRate();
-  convertAllYenToUSD();
-}
-
 function convertStringToNumber(str) {
   // Remove non-numeric characters except for the decimal point
   var cleanedString = str.replace(/[^\d.-]/g, "");
@@ -143,7 +168,6 @@ function replaceTextWithConversion(originalText) {
     const usdAmount = "~" + convertYentoUSD(yenAmount);
     modifiedText = modifiedText.replace(match[0], match[0] + ` <strong>(${usdAmount} USD)</strong>`);
   }
-
   return modifiedText;
 }
 
@@ -167,41 +191,4 @@ function convertAllYenToUSD() {
     }
   });
 }
-
-// chrome.runtime.onMessage.addListener(function (request) {
-//   if (request.desiredCurrency !== undefined) {
-//     wantedCurrency = request.desiredCurrency;
-//     formatter = new Intl.NumberFormat("en-US", {
-//       style: "currency",
-//       currency: wantedCurrency,
-//     });
-//     chrome.storage.local.set({ desiredCurrency: wantedCurrency });
-//   }
-//   location.reload();
-// });
-
-// chrome.runtime.onMessage.addListener(function (request) {
-//   if (request.currentCurrency !== undefined) {
-//     currentCurrency = request.currentCurrency;
-//     chrome.storage.local.set({ currentCurrency: currentCurrency });
-//   }
-//   location.reload();
-// });
-
-// chrome.runtime.onMessage.addListener(function (request) {
-//   if (request.apiKey !== undefined) {
-//     apiKey = request.apiKey;
-//     chrome.storage.local.set({ apiKey: apiKey });
-//   }
-//   location.reload();
-// });
-
-chrome.runtime.onMessage.addListener(function (request) {
-  if (request.toggleState !== undefined) {
-    toggleState = request.toggleState;
-    chrome.storage.local.set({ toggleState: toggleState });
-  }
-  location.reload();
-});
-
 getLocalStorage();
