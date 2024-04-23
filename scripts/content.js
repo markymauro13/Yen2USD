@@ -21,8 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// to make apikey an env variable, reference: https://github.com/orgs/community/discussions/57070#discussioncomment-6240545
-const apiKey = "";
+var apiKey;
 
 // set to true if you want to bypass monthly call and call API every time the page is loaded
 const DEBUG_API = false;
@@ -98,6 +97,10 @@ chrome.runtime.onMessage.addListener(function (request) {
 });
 
 async function getLocalStorage() {
+  await chrome.storage.sync.get(["apiKey"], function (result) {
+    apiKey = result.apiKey;
+  });
+
   chrome.storage.local.get(["currentCurrency", "desiredCurrency", "toggleState"], function (data) {
     currentCurrency = data.currentCurrency !== undefined ? data.currentCurrency : "JPY";
     wantedCurrency = data.desiredCurrency !== undefined ? data.desiredCurrency : "USD";
