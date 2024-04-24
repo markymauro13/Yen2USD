@@ -9,3 +9,4 @@ look at these sites:
 
 - https://realestate.co.jp/en/forsale/listing?prefecture=&city=&district=&max_price=&search=Search
 - https://blog.villagehouse.jp/en/local-area-guides/the-most-expensive-cities-to-live-in-japan/
+- https://www.villagehouse.jp/en/rent/hokkaido/hokkaido/iwamizawa-shi-012106/kurisawa-1039/#1LDK
