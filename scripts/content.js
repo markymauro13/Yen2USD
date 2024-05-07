@@ -23,7 +23,7 @@
 
 // Create `scripts/API_KEY.js`
 // Add `var API_KEY = "YOUR_API_KEY";`
-// Replace 'YOUR_API_KEY` with your real API key
+// Replace `YOUR_API_KEY` with your real API key
 const apiKey = window["API_KEY"];
 
 // set to true if you want to bypass monthly call and call API every time the page is loaded
