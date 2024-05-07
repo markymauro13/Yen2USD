@@ -21,7 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-var apiKey;
+// Create `scripts/API_KEY.js`
+// Add `var API_KEY = "YOUR_API_KEY";`
+// Replace 'YOUR_API_KEY` with your real API key
+const apiKey = window["API_KEY"];
 
 // set to true if you want to bypass monthly call and call API every time the page is loaded
 const DEBUG_API = false;
@@ -97,10 +100,6 @@ chrome.runtime.onMessage.addListener(function (request) {
 });
 
 async function getLocalStorage() {
-  await chrome.storage.sync.get(["apiKey"], function (result) {
-    apiKey = result.apiKey;
-  });
-
   chrome.storage.local.get(["currentCurrency", "desiredCurrency", "toggleState"], function (data) {
     currentCurrency = data.currentCurrency !== undefined ? data.currentCurrency : "JPY";
     wantedCurrency = data.desiredCurrency !== undefined ? data.desiredCurrency : "USD";
